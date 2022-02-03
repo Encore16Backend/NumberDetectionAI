@@ -4,7 +4,7 @@ import cv2
 import HandTrackingModule as htm
 from keras.models import load_model
 
-model = load_model('./model/mnist_model.h5')
+model = load_model('.\\model\\mnist_model.h5')
 
 brushThickness = 15
 eraserThickness = 50
@@ -149,6 +149,8 @@ while True:
     cv2.putText(img, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0), 2)
     cv2.putText(img, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0), 2)
     cv2.putText(img, str(PredictText), (10, 500), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
+
+
     cv2.imshow("Image", img)
     if cv2.waitKey(1) == ord('q'):
         break
