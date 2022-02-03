@@ -1,1 +1,5 @@
 # NumberDetectionAI
+
+* mediapipi
+* opencv
+* tensorflow
