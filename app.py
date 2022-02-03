@@ -1,3 +1,4 @@
+import sqlite3
 from flask import Flask, render_template, Response
 import cv2
 import HandTrackingModule as htm
@@ -7,9 +8,12 @@ from keras.models import load_model
 
 app = Flask(__name__)
 
-def get_frames():
-    model = load_model('.\\model\\mnist_model.h5')
+model = load_model('.\\model\\mnist_model.h5')
 
+db_path = os.path.dirname(__file__) + '\database'
+db = os.path.join(db_path, 'dashboard.sqlite')
+
+def get_frames():
     brushThickness = 15
     eraserThickness = 50
 
@@ -155,9 +159,26 @@ def get_frames():
         yield (b'--frame\r\n'
                b'Content-Type: image/jpeg\r\n\r\n' + img + b'\r\n')
 
+def select_dashboard():
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    c.execute("SELECT * FROM dashboard_db")
+    dashboard = c.fetchall()
+    conn.commit()
+    conn.close()
+    return dashboard
+
+def insert_dashboard(nickname, score):
+    conn = sqlite3.connect(db)
+    c = conn.cursor()
+    c.execute("INSERT INTO dashboard_db (nickname, score) VALUES (?, ?)", (nickname, score))
+    conn.commit()
+    conn.close()
+
 @app.route('/')
 def hello_world():  # put application's code here
-    return render_template('index.html')
+    dashboard = select_dashboard()
+    return render_template('index.html', dashboard=dashboard)
 
 @app.route('/video_feed')
 def video_feed():

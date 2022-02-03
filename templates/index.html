@@ -2,15 +2,28 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title>Title</title>
+    <title>Number Match Game</title>
 </head>
 <body>
-<div class="container">
-    <div class="row">
+<div class="container" style="width: 100%">
+    <div class="row" style="width:70%; float:left;">
         <div class="col-lg-8  offset-lg-2">
-            <h3 class="mt-5">Numbers Match Game</h3>
             <img src="{{ url_for('video_feed') }}" width="100%">
         </div>
+    </div>
+    <div style="width:30%; float:right;">
+        <table>
+            <thead>
+                <td>NICKNAME</td>
+                <td>SCORE</td>
+            </thead>
+            {% for row in dashboard %}
+                <tr>
+                    <td>{{ row[0] }}</td>
+                    <td>{{ row[1] }}</td>
+                </tr>
+            {% endfor %}
+        </table>
     </div>
 </div>
 </body>
