@@ -3,6 +3,36 @@
 <head>
     <meta charset="UTF-8">
     <title>Number Match Game</title>
+{#    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>#}
+    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        function mouseEvent(){
+            $.ajax({
+                url:"/mouseEvent",
+                type:"POST",
+                success: function (result){
+                    {#console.log(result);#}
+                }
+            });
+        }
+
+        function predictEvent(){
+            $.ajax({
+                url:"/predictEvent",
+                type:"POST",
+                success: function (result){}
+            });
+        }
+
+        window.onkeydown = (e) => {
+            if (e.code == 'Space'){
+                mouseEvent();
+            }
+            if (e.code == 'Enter'){
+                predictEvent();
+            }
+        }
+    </script>
 </head>
 <body>
 <div class="container" style="width: 100%">
