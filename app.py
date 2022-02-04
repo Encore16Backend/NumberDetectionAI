@@ -9,9 +9,12 @@ from keras.models import load_model
 
 app = Flask(__name__)
 
-model = load_model('.\\model\\mnist_model.h5')
+dir_path = os.path.dirname(__file__)
 
-db_path = os.path.dirname(__file__) + '\database'
+model_path = dir_path + '\model\mnist_model.h5'
+model = load_model(model_path)
+
+db_path = dir_path + '\database'
 db = os.path.join(db_path, 'dashboard.sqlite')
 
 mousePaint = True
@@ -34,14 +37,13 @@ cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 25
 # cv2.waitKey()
 # cv2.destroyAllWindows()
 
-# global img
 
 def get_frames():
     global imgCanvas, POINT, SUGGESTION, predict, PredictText, imgText
     brushThickness = 15
     eraserThickness = 50
 
-    folderPath = 'image'
+    folderPath = dir_path + '\image'
     brushList = os.listdir(folderPath)
     overlayList = []
     for imPath in brushList:
@@ -185,9 +187,9 @@ def predict_num():
     point_text = "Point: " + str(POINT)
     suggestion_text = "SUGGESTION: " + str(SUGGESTION)
 
-    cv2.putText(imgText, str(PredictText), (10, 500), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 255), 2)
-    cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0), 2)
-    cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (0, 0, 0), 2)
+    cv2.putText(imgText, str(PredictText), (10, 500), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
+    cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+    cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
 
 def select_dashboard():
     conn = sqlite3.connect(db)
