@@ -9,6 +9,12 @@ from keras.models import load_model
 
 app = Flask(__name__)
 
+# start 변수들
+name =''
+start = True
+startIndex = 0
+t = "text"
+
 dir_path = os.path.dirname(__file__)
 
 model_path = dir_path + '\model\mnist_model.h5'
@@ -37,7 +43,7 @@ xp, yp = 0, 0
 
 
 def get_frames():
-    global imgCanvas, POINT, SUGGESTION, predict, PredictText, imgText, xp, yp
+    global imgCanvas, POINT, SUGGESTION, predict, PredictText, imgText, xp, yp,start,startIndex
     brushThickness = 15
     eraserThickness = 50
 
@@ -61,8 +67,14 @@ def get_frames():
 
     while True:
         # import image
-        success, img = cap.read()
-
+        if start :
+            img = cv2.imread('./image/start'+str(startIndex)+'.png')
+            startIndex = startIndex+1
+            if startIndex>4 : startIndex=0
+        else :
+            success, img = cap.read()
+        img = cv2.resize(img,(1280,720))
+        
         # find hand landmarks
         img = cv2.flip(img, 1)
 
@@ -135,7 +147,8 @@ def get_frames():
         # img = cv2.bitwise_or(img, ~imgText)
 
         # setting the header image
-        img[0:125, 0:1280] = header
+        if start == False :
+            img[0:125, 0:1280] = header
         # cv2.imshow("Canvas", imgCanvas)
 
         ret, buffer = cv2.imencode('.jpg', img)
@@ -209,8 +222,9 @@ def insert_dashboard(nickname, score):
 
 @app.route('/')
 def hello_world():  # put application's code here
+    global t
     dashboard = select_dashboard()
-    return render_template('index.html', dashboard=dashboard)
+    return render_template('index.html', dashboard=dashboard, t=t)
 
 @app.route('/video_feed')
 def video_feed():
@@ -235,6 +249,16 @@ def predict_event():
         predict_num()
         return 'SUCCESS'
 
+@app.route('/', methods=['POST'])
+def start_event():
+    global start,name, t
+    # dashboard = select_dashboard()
+    if request.method == 'POST':
+        name = request.form.get('start')
+        start = False
+        t ='hidden'
+    return hello_world()
+
 
 if __name__ == '__main__':
-    app.run(debug=True)
+    app.run()#debug=True)

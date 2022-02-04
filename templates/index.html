@@ -50,6 +50,10 @@
     <div class="row" style="width:70%; float:left;">
         <div class="col-lg-8  offset-lg-2">
             <img src="{{ url_for('video_feed') }}" width="100%">
+            <form method="post" action="{{ url_for('start_event') }}">
+            <input type={{t}} name="start" style="position: absolute; text-align: center; font-style: italic; font-size : 50px; left : 17%; top : 20vw; width: 35%; height: 60px;" />
+            
+            </form>
         </div>
     </div>
     <div style="width:29%; float:right;" id="wrap">
