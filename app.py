@@ -134,7 +134,6 @@ def get_frames():
         img = cv2.bitwise_and(img, imgInv)
         img = cv2.bitwise_or(img, imgCanvas)
         img[imgText[:, :, :] == 255] = 0
-        # img = cv2.bitwise_or(img, ~imgText)
 
         # setting the header image
         img[0:125, 0:1280] = header
