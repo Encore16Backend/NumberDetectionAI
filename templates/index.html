@@ -32,6 +32,17 @@
                 predictEvent();
             }
         }
+        let start = 0;
+        let color = Math.floor(Math.random() * 100).toString();
+        setInterval(backGround ,1000);
+        function backGround(){
+            start += 1;
+            if (start % 1 == 0){
+                color = Math.floor(Math.random() * 100).toString();
+                color = color.padStart(2, '0');
+                $("body").css("background", '#'+color+color+color);
+            }
+        }
     </script>
 </head>
 <body>
