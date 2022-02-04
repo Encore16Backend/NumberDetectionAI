@@ -1,6 +1,7 @@
 #wrap {
     width: 1000px;
 	margin:auto;
+    padding-left: 10px;
 }
 table{
     width: 100%;

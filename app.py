@@ -32,18 +32,16 @@ point_text = "Point: " + str(POINT)
 suggestion_text = "SUGGESTION: " + str(SUGGESTION)
 cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
 cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
-# cv2.imshow('test1', imgCanvas)
-# cv2.imshow('test2', imgText)
-# cv2.waitKey()
-# cv2.destroyAllWindows()
+
+xp, yp = 0, 0
 
 
 def get_frames():
-    global imgCanvas, POINT, SUGGESTION, predict, PredictText, imgText
+    global imgCanvas, POINT, SUGGESTION, predict, PredictText, imgText, xp, yp
     brushThickness = 15
     eraserThickness = 50
 
-    folderPath = dir_path + '\image'
+    folderPath = 'image'
     brushList = os.listdir(folderPath)
     overlayList = []
     for imPath in brushList:
@@ -123,17 +121,18 @@ def get_frames():
                 xp, yp = x1, y1
                 if not predict:
                     predict = True
-            elif sum(fingers) == 0 and predict:
-                # print("predict")
-                predict_num()
-                predict = False
-                xp, yp = 0, 0
+            # elif sum(fingers) == 0 and predict:
+            #     # print("predict")
+            #     predict_num()
+            #     predict = False
+            #     xp, yp = 0, 0
         imgGray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
         _, imgInv = cv2.threshold(imgGray, 50, 255, cv2.THRESH_BINARY_INV)
         imgInv = cv2.cvtColor(imgInv, cv2.COLOR_GRAY2BGR)
         img = cv2.bitwise_and(img, imgInv)
         img = cv2.bitwise_or(img, imgCanvas)
         img[imgText[:, :, :] == 255] = 0
+        # img = cv2.bitwise_or(img, ~imgText)
 
         # setting the header image
         img[0:125, 0:1280] = header
@@ -146,7 +145,7 @@ def get_frames():
 
 
 def predict_num():
-    global imgCanvas, SUGGESTION, POINT, PredictText, imgText
+    global imgCanvas, SUGGESTION, POINT, PredictText, imgText, xp, yp
     imgCanvas_gray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
     blur = cv2.medianBlur(imgCanvas_gray, 15)
     blur = cv2.GaussianBlur(blur, (5, 5), 0)
@@ -180,6 +179,8 @@ def predict_num():
             POINT += 1
             SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
 
+    xp, yp = 0, 0
+
     imgCanvas = np.zeros((720, 1280, 3), np.uint8)
     imgText = np.zeros((720, 1280, 3), np.uint8)
 
@@ -193,7 +194,7 @@ def predict_num():
 def select_dashboard():
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    c.execute("SELECT * FROM dashboard_db")
+    c.execute("SELECT rowid, nickname, score FROM dashboard_db ORDER BY score LIMIT 10")
     dashboard = c.fetchall()
     conn.commit()
     conn.close()
