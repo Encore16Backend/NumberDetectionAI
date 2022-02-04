@@ -3,52 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <title>Number Match Game</title>
-{#    <script src="{{ url_for('static', filename='js/jquery-3.6.0.min.js') }}"></script>#}
-    <script type="text/javascript" src="http://code.jquery.com/jquery-3.6.0.min.js"></script>
-    <script>
-        function mouseEvent(){
-            $.ajax({
-                url:"/mouseEvent",
-                type:"POST",
-                success: function (result){
-                    {#console.log(result);#}
-                }
-            });
-        }
-
-        function predictEvent(){
-            $.ajax({
-                url:"/predictEvent",
-                type:"POST",
-                success: function (result){}
-            });
-        }
-
-        window.onkeydown = (e) => {
-            if (e.code == 'Space'){
-                mouseEvent();
-            }
-            if (e.code == 'Enter'){
-                predictEvent();
-            }
-        }
-    </script>
 </head>
 <body>
+
 <div class="container" style="width: 100%">
     <div class="row" style="width:70%; float:left;">
         <div class="col-lg-8  offset-lg-2">
             <img src="{{ url_for('video_feed') }}" width="100%">
         </div>
     </div>
-    <div style="width:30%; float:right;">
+    <div id="wrap">
         <table>
             <thead>
-                <td>NICKNAME</td>
-                <td>SCORE</td>
+            <tr>
+                <th>Rank</th>
+                <th>Nickname</th>
+                <th>Score</th>
+            </tr>
             </thead>
+
             {% for row in dashboard %}
                 <tr>
+                    <td>1</td>
                     <td>{{ row[0] }}</td>
                     <td>{{ row[1] }}</td>
                 </tr>
@@ -58,3 +34,4 @@
 </div>
 </body>
 </html>
+<link href="{{ url_for('static', filename='css/a.css') }}" rel="stylesheet">
