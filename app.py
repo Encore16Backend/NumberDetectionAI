@@ -117,7 +117,8 @@ def handPainting():
                 cv2.line(imgCanvas, (xp, yp), (x1, y1), drawColor, eraserThickness)
             else:
                 # cv2.line(img, (xp, yp), (x1, y1), drawColor, brushThickness)
-                cv2.line(imgCanvas, (xp, yp), (x1, y1), drawColor, brushThickness)
+                if y1 > 125:
+                    cv2.line(imgCanvas, (xp, yp), (x1, y1), drawColor, brushThickness)
 
             xp, yp = x1, y1
             # if not predict:
@@ -154,7 +155,8 @@ def mousePainting():
             cv2.line(imgCanvas, (xp, yp), (mx, my), drawColor, eraserThickness)
         else:
             # cv2.line(img, (xp, yp), (x1, y1), drawColor, brushThickness)
-            cv2.line(imgCanvas, (xp, yp), (mx, my), drawColor, brushThickness)
+            if my > 125:
+                cv2.line(imgCanvas, (xp, yp), (mx, my), drawColor, brushThickness)
         xp, yp = mx, my
     return
 
@@ -172,6 +174,7 @@ def get_frames():
             img = cv2.resize(img, (1280, 720))
             img = cv2.flip(img, 1)
 
+            cv2.putText(img, "Your Nick Name" + name, (360, 330), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4, (255, 255, 255), 2)
             imageIndex = (imageIndex + 1) % 4
         elif end:
             if imageIndex > 1: imageIndex = 0

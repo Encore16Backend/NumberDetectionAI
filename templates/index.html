@@ -62,6 +62,12 @@
             });
         }
 
+        function nickNameInput(){
+            let input = document.getElementsByName("nickname");
+            input[0].value = input[0].value.replace(" ", "");
+            input[0].value = input[0].value.replace(/[ㄱ-ㅎㅏ-ㅣ가-힣]/g, "");
+        }
+
         function predictEvent(){
             $.ajax({
                 url:"/predictEvent",
@@ -92,26 +98,16 @@
                 endEvent();
             }
         }
-        let start = 0;
-        let color = Math.floor(Math.random() * 100).toString();
-        setInterval(backGround ,1000);
-        function backGround(){
-            start += 1;
-            if (start % 1 == 0){
-                color = Math.floor(Math.random() * 100).toString();
-                color = color.padStart(2, '0');
-                $("body").css("background", '#'+color+color+color);
-            }
-        }
+
     </script>
 </head>
-<body>
+<body style="background-image:url('../static/image/background.png')">
 <div class="container" style="width: 100%">
     <div class="row" style="width:70%; float:left;">
         <div class="col-lg-8  offset-lg-2">
             <!-- onclick="mouse_painting(event)" -->
             <img id="myVideo" onclick="mouseState()" src="{{ url_for('video_feed') }}" width="100%">
-            <input type="text" id="nickname" name="nickname" style="position: absolute; text-align: center; font-style: italic; font-size : 50px; left : 17%; top : 20vw; width: 35%; height: 60px;" />
+            <input type="text" id="nickname" name="nickname" onkeyup="nickNameInput()" style="position: absolute; text-align: center; font-style: italic; font-size : 50px; left : 17%; top : 20vw; width: 35%; height: 60px;" />
         </div>
     </div>
     <div style="width:29%; float:right;" id="wrap">
