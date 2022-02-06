@@ -121,9 +121,9 @@
             </thead>
 
             {% for index in range(dashboard | length) %}
-                <tr>
+                <tr id="rank{{ index+1 }}">
                     <td>{{ index+1 }}</td>
-                    <td>{{ dashboard[index][0] }}</td>
+                    <td style="border-bottom-style:ridge">{{ dashboard[index][0] }}</td>
                     <td>{{ dashboard[index][1] }}</td>
                 </tr>
             {% endfor %}
