@@ -7,7 +7,6 @@ import numpy as np
 import os
 from keras.models import load_model
 from pynput.mouse import Controller
-from win32api import GetSystemMetrics
 
 app = Flask(__name__)
 
@@ -33,6 +32,7 @@ imgText = np.zeros((720, 1280, 3), np.uint8)
 
 LIFE_COUNT = 3
 lifeList = cv2.imread('image/life'+str(LIFE_COUNT)+'.png')
+lifeList = cv2.resize(lifeList, (240, 118))
 
 POINT = 0
 SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
@@ -64,12 +64,11 @@ drawColor = (255, 0, 255)
 
 mode = True # Hand True, Mouse False
 mouse = Controller()
-scaleX, scaleY = GetSystemMetrics(0) / 1280, GetSystemMetrics(1) / 720
 width , height = 0,0
 mouseState = False
 
-def handPainting(img, imgCanvas):
-    global xp, yp, drawColor, header
+def handPainting():
+    global xp, yp, drawColor, header, img, imgCanvas
     img = detector.findHands(img)
     lmList = detector.findPosition(img, draw=False)
 
@@ -123,10 +122,10 @@ def handPainting(img, imgCanvas):
             xp, yp = x1, y1
             # if not predict:
             #     predict = True
-    return img, imgCanvas, header
+    return
 
-def mousePainting(img, imgCanvas):
-    global xp, yp, drawColor, header, width, height, mouseState
+def mousePainting():
+    global xp, yp, drawColor, header, width, height, mouseState, img, imgCanvas
     mx, my = mouse.position
     mx = int((mx-int(screenX))*1280/int(width))
     my = int((my-int(screenY)-110)*720/int(height))
@@ -157,10 +156,10 @@ def mousePainting(img, imgCanvas):
             # cv2.line(img, (xp, yp), (x1, y1), drawColor, brushThickness)
             cv2.line(imgCanvas, (xp, yp), (mx, my), drawColor, brushThickness)
         xp, yp = mx, my
-    return img, imgCanvas, header
+    return
 
 def get_frames():
-    global imgCanvas, start, img, header, imageIndex, img, lifeList
+    global imgCanvas, start, img, header, imageIndex, img, lifeList, PredictText, point_text, suggestion_text
 
     cap = cv2.VideoCapture(0)
     cap.set(3, 1280)
@@ -190,16 +189,15 @@ def get_frames():
         else:
             success, img = cap.read()
             img = cv2.resize(img,(1280,720))
-
-
-            lifeList = cv2.resize(lifeList, (240, 118))
-
             # find hand landmarks
             img = cv2.flip(img, 1)
 
             ##### HAND PAINTING #####
-            img, imgCanvas, header = handPainting(img, imgCanvas) if mode else mousePainting(img, imgCanvas)
+            handPainting() if mode else mousePainting()
 
+            cv2.putText(imgText, str(PredictText), (10, 500), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
+            cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+            cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
 
             ###### Display Img ######
             imgGray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
@@ -211,7 +209,8 @@ def get_frames():
 
             # setting the header image
             img[0:125, 0:1280] = header
-            img[130:130 + 118, -240:] = cv2.bitwise_and(img[130:130 + 118, -240:], lifeList)
+            if LIFE_COUNT > 0:
+                img[130:130 + 118, -240:] = cv2.bitwise_and(img[130:130 + 118, -240:], lifeList)
 
         ret, buffer = cv2.imencode('.jpg', img)
         img = buffer.tobytes()
@@ -220,13 +219,7 @@ def get_frames():
 
 
 def predict_num():
-    global imgCanvas, SUGGESTION, POINT, PredictText, imgText, xp, yp, LIFE_COUNT, lifeList, end, img
-
-    if LIFE_COUNT == 0:
-        end = True
-        imgCanvas = np.zeros((720, 1280, 3), np.uint8)
-        imgText = np.zeros((720, 1280, 3), np.uint8)
-        return
+    global imgCanvas, SUGGESTION, POINT, PredictText, imgText, xp, yp, LIFE_COUNT, lifeList, end, img, point_text, suggestion_text
 
     imgCanvas_gray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
     blur = cv2.medianBlur(imgCanvas_gray, 15)
@@ -265,9 +258,12 @@ def predict_num():
                 SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
             else:
                 LIFE_COUNT -= 1
-                SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
-                lifeList = cv2.imread('image/life' + str(LIFE_COUNT) + '.png')
-                lifeList = cv2.resize(lifeList, (240, 118))
+                if LIFE_COUNT == 0:
+                    end = True
+                else:
+                    SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
+                    lifeList = cv2.imread('image/life' + str(LIFE_COUNT) + '.png')
+                    lifeList = cv2.resize(lifeList, (240, 118))
                 # img[130:130 + 118, -240:] = cv2.bitwise_and(img[130:130 + 118, -240:], lifeList)
     # 아무것도 안쓰고 확인하면 예측 숫자 자리에 none
     if not predict_list:
@@ -278,14 +274,12 @@ def predict_num():
 
     point_text = "Point: " + str(POINT)
     suggestion_text = "SUGGESTION: " + str(SUGGESTION)
-    cv2.putText(imgText, str(PredictText), (10, 500), cv2.FONT_HERSHEY_PLAIN, 2, (0, 255, 0), 2)
-    cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
-    cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
+
 
 def select_dashboard():
     conn = sqlite3.connect(db)
     c = conn.cursor()
-    c.execute("SELECT rowid, nickname, score FROM dashboard_db ORDER BY score DESC LIMIT 10")
+    c.execute("SELECT nickname, score FROM dashboard_db ORDER BY score DESC LIMIT 10")
     dashboard = c.fetchall()
     conn.commit()
     conn.close()
@@ -349,13 +343,26 @@ def start_event():
 
 @app.route('/endEvent', methods=['POST'])
 def end_Event():
-    global start, end, POINT, name, LIFE_COUNT
+    global start, end, POINT, name, LIFE_COUNT, lifeList, imgCanvas, imgText, point_text, suggestion_text, SUGGESTION, predict, PredictText
     if request.method == 'POST':
         start = True
         end = False
         insert_dashboard(name, POINT)
+
+        imgText = np.zeros((720, 1280, 3), np.uint8)
+        imgCanvas = np.zeros((720, 1280, 3), np.uint8)
+
         POINT = 0
+        SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
+        predict = False
+        PredictText = ""
+
+        point_text = "Point: " + str(POINT)
+        suggestion_text = "SUGGESTION: " + str(SUGGESTION)
+
         LIFE_COUNT = 3
+        lifeList = cv2.imread('image/life' + str(LIFE_COUNT) + '.png')
+        lifeList = cv2.resize(lifeList, (240, 118))
 
         return "SUCCES"
 

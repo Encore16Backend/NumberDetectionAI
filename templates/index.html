@@ -18,13 +18,16 @@
         }
 
         function startGame(){
+            let input = document.getElementsByName("nickname");
             $.ajax({
                 url:"/startEvent",
                 type:'POST',
                 data: {
-                    nickname:document.getElementsByName("nickname")[0].value
+                    nickname:input[0].value
                 },
-                success:function(result){}
+                success:function(result){
+                    input[0].value = null;
+                }
             });
         }
 
@@ -121,11 +124,11 @@
             </tr>
             </thead>
 
-            {% for row in dashboard %}
+            {% for index in range(dashboard | length) %}
                 <tr>
-                    <td>{{ row[0] }}</td>
-                    <td>{{ row[1] }}</td>
-                    <td>{{ row[2] }}</td>
+                    <td>{{ index+1 }}</td>
+                    <td>{{ dashboard[index][0] }}</td>
+                    <td>{{ dashboard[index][1] }}</td>
                 </tr>
             {% endfor %}
         </table>
