@@ -268,7 +268,7 @@ def predict_num():
                 SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
                 lifeList = cv2.imread('image/life' + str(LIFE_COUNT) + '.png')
                 lifeList = cv2.resize(lifeList, (240, 118))
-                img[130:130 + 118, -240:] = cv2.bitwise_and(img[130:130 + 118, -240:], lifeList)
+                # img[130:130 + 118, -240:] = cv2.bitwise_and(img[130:130 + 118, -240:], lifeList)
     # 아무것도 안쓰고 확인하면 예측 숫자 자리에 none
     if not predict_list:
         PredictText = 'none'
