@@ -24,7 +24,6 @@ model = load_model(model_path)
 db_path = dir_path + '\database'
 db = os.path.join(db_path, 'dashboard.sqlite')
 
-
 img = np.zeros((720, 1280, 3), np.uint8)
 imgCanvas = np.zeros((720, 1280, 3), np.uint8)
 imgText = np.zeros((720, 1280, 3), np.uint8)
@@ -174,7 +173,7 @@ def get_frames():
             img = cv2.resize(img, (1280, 720))
             img = cv2.flip(img, 1)
 
-            cv2.putText(img, "Your Nick Name" + name, (360, 330), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4, (255, 255, 255), 2)
+            cv2.putText(img, "Your Nick Name", (360, 330), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4, (255, 255, 255), 2)
             imageIndex = (imageIndex + 1) % 4
         elif end:
             if imageIndex > 1: imageIndex = 0
