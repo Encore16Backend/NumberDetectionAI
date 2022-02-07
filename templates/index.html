@@ -8,12 +8,37 @@
     <script>
         let state = 0;
         let mode = true;
+        let table;
+
+        function init(){
+            table = document.querySelector("#tbl");
+            $.ajax({
+                url:"/dashboard",
+                type:"GET",
+                success: function (result){
+                    let tag = "<thead><tr><th>Rank</th><th></th><th>NickName</th><th>Score</th></tr></thead>";
+                    for (let i=0; i<result.length; i++){
+                        tag += "<tr id='rank" + (i+1) + "'><td>" + (i+1) + "</td>";
+                        if(i < 3){
+                            tag += "<td>" + "<img src=" + "../static/image/rank" + (i+1).toString() + ".png" + " width='25' height='30' />" + "</td>"
+                        } else {
+                            tag += "<td></td>"
+                        }
+                        tag += '<td style="border-bottom-style:ridge">' + result[i][0] + "</td>";
+                        tag += "<td>" + result[i][1] + "</td></tr>";
+                    }
+                    table.innerHTML = tag;
+                }
+            })
+        }
 
         function endEvent(){
             $.ajax({
                 url:"/endEvent",
                 type:"POST",
-                success: function (result){}
+                success: function (result){
+                    init();
+                }
             });
         }
 
@@ -101,7 +126,7 @@
 
     </script>
 </head>
-<body style="background-image:url('../static/image/background.png')">
+<body style="background-image:url('../static/image/background.png')" onload="init()">
 <div class="container" style="width: 100%">
     <div class="row" style="width:70%; float:left;">
         <div class="col-lg-8  offset-lg-2">
@@ -111,23 +136,7 @@
         </div>
     </div>
     <div style="width:29%; float:right;" id="wrap">
-        <table>
-            <thead>
-            <tr>
-                <th>Rank</th>
-                <th>NickName</th>
-                <th>Score</th>
-            </tr>
-            </thead>
-
-            {% for index in range(dashboard | length) %}
-                <tr id="rank{{ index+1 }}">
-                    <td>{{ index+1 }}</td>
-                    <td style="border-bottom-style:ridge">{{ dashboard[index][0] }}</td>
-                    <td>{{ dashboard[index][1] }}</td>
-                </tr>
-            {% endfor %}
-        </table>
+        <table id="tbl"></table>
     </div>
 </div>
 </body>

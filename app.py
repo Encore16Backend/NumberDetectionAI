@@ -1,6 +1,6 @@
 import sqlite3
 from flask import Flask, render_template, Response
-from flask import request
+from flask import request, jsonify
 import cv2
 import HandTrackingModule as htm
 import numpy as np
@@ -33,12 +33,13 @@ LIFE_COUNT = 3
 lifeList = cv2.imread('image/life'+str(LIFE_COUNT)+'.png')
 lifeList = cv2.resize(lifeList, (240, 118))
 
+SCORE = 0
 POINT = 0
 SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
 predict = False
 PredictText = ""
 
-point_text = "Point: " + str(POINT)
+point_text = "Point: " + str(SCORE)
 suggestion_text = "SUGGESTION: " + str(SUGGESTION)
 cv2.putText(imgText, suggestion_text, (10, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
 cv2.putText(imgText, point_text, (580, 160), cv2.FONT_HERSHEY_PLAIN, 2, (255, 255, 255), 2)
@@ -160,7 +161,7 @@ def mousePainting():
     return
 
 def get_frames():
-    global imgCanvas, start, img, header, imageIndex, img, lifeList, PredictText, point_text, suggestion_text
+    global imgCanvas, start, img, header, imageIndex, img, lifeList, PredictText, point_text, suggestion_text, SCORE
 
     cap = cv2.VideoCapture(0)
     cap.set(3, 1280)
@@ -183,7 +184,7 @@ def get_frames():
             img = cv2.flip(img, 1)
             cv2.putText(img, "Nick Name : " + name, (190, 350), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4,
                         (255, 255, 255), 2)
-            cv2.putText(img, "Score : {} POINT".format(POINT), (350, 450), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4,
+            cv2.putText(img, "Score : {} POINT".format(SCORE), (350, 450), cv2.FONT_HERSHEY_PLAIN | cv2.FONT_ITALIC, 4,
                         (255, 255, 255), 2)
             cv2.putText(img, "Press 'Q' START", (270, 600), cv2.FONT_HERSHEY_PLAIN, 5, (255, 255, 255), 2)
 
@@ -221,7 +222,7 @@ def get_frames():
 
 
 def predict_num():
-    global imgCanvas, SUGGESTION, POINT, PredictText, imgText, xp, yp, LIFE_COUNT, lifeList, end, img, point_text, suggestion_text
+    global imgCanvas, SUGGESTION, POINT, PredictText, imgText, xp, yp, LIFE_COUNT, lifeList, end, img, point_text, suggestion_text, SCORE
 
     imgCanvas_gray = cv2.cvtColor(imgCanvas, cv2.COLOR_BGR2GRAY)
     blur = cv2.medianBlur(imgCanvas_gray, 15)
@@ -258,6 +259,7 @@ def predict_num():
             if str(SUGGESTION) == PredictText:
                 POINT += 1
                 SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
+                SCORE += 10 if mode else 5
             else:
                 LIFE_COUNT -= 1
                 if LIFE_COUNT == 0:
@@ -274,10 +276,10 @@ def predict_num():
     imgCanvas = np.zeros((720, 1280, 3), np.uint8)
     imgText = np.zeros((720, 1280, 3), np.uint8)
 
-    point_text = "Point: " + str(POINT)
+    point_text = "Point: " + str(SCORE)
     suggestion_text = "SUGGESTION: " + str(SUGGESTION)
 
-
+@app.route("/dashboard")
 def select_dashboard():
     conn = sqlite3.connect(db)
     c = conn.cursor()
@@ -285,7 +287,7 @@ def select_dashboard():
     dashboard = c.fetchall()
     conn.commit()
     conn.close()
-    return dashboard
+    return jsonify(dashboard)
 
 def insert_dashboard(nickname, score):
     conn = sqlite3.connect(db)
@@ -297,7 +299,7 @@ def insert_dashboard(nickname, score):
 @app.route('/')
 def main():  # put application's code here
     dashboard = select_dashboard()
-    return render_template('index.html', dashboard=dashboard)
+    return render_template('index.html')
 
 @app.route('/video_feed')
 def video_feed():
@@ -345,28 +347,29 @@ def start_event():
 
 @app.route('/endEvent', methods=['POST'])
 def end_Event():
-    global start, end, POINT, name, LIFE_COUNT, lifeList, imgCanvas, imgText, point_text, suggestion_text, SUGGESTION, predict, PredictText
+    global start, end, POINT, name, LIFE_COUNT, lifeList, imgCanvas, imgText, point_text, suggestion_text, SUGGESTION, predict, PredictText, SCORE
     if request.method == 'POST':
         start = True
         end = False
-        insert_dashboard(name, POINT)
+        insert_dashboard(name, SCORE)
 
         imgText = np.zeros((720, 1280, 3), np.uint8)
         imgCanvas = np.zeros((720, 1280, 3), np.uint8)
 
+        SCORE = 0
         POINT = 0
         SUGGESTION = str(np.random.randint(low=10 ** POINT, high=10 ** (POINT + 1)))
         predict = False
         PredictText = ""
 
-        point_text = "Point: " + str(POINT)
+        point_text = "Point: " + str(SCORE)
         suggestion_text = "SUGGESTION: " + str(SUGGESTION)
 
         LIFE_COUNT = 3
         lifeList = cv2.imread('image/life' + str(LIFE_COUNT) + '.png')
         lifeList = cv2.resize(lifeList, (240, 118))
 
-        return "SUCCES"
+        return "SUCCESS"
 
 if __name__ == '__main__':
     app.run()#debug=True)
