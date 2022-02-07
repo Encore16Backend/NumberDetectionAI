@@ -8,7 +8,7 @@
 * Web - Flask
 * Live Steaming 
 
-<img width="40%" src="https://user-images.githubusercontent.com/95116074/152720750-b282ce7c-47aa-4caf-b772-c2b855c62212.gif"/>
+<img width="40%" src="https://user-images.githubusercontent.com/95116074/152723320-2c89d1dd-4dfe-4dc4-bd73-c7a2ef53e426.gif"/>
 
 
 
@@ -22,4 +22,6 @@
 <img width="40%" src="https://user-images.githubusercontent.com/95116074/152722171-2f923ba5-e8a5-4b45-80c0-4ffca00c56cf.gif"/>
 
 
-<img width="40%" src="https://user-images.githubusercontent.com/95116074/152722848-08420fc0-2953-44d4-8549-b4d0bcdab82b.gif"/>
+<img width="40%" src="https://user-images.githubusercontent.com/95116074/152723517-824c278a-b907-480f-afd9-550728fd12a5.gif"/>
+
+
